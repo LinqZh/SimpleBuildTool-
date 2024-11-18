@@ -136,7 +136,7 @@ if __name__ == '__main__':
             if args.padType == "Unity_Split_Pad":
                 package_name = param_pass_parser["buildOutput"]["aabName"]
                 symbol = "bundle"
-                extension = "abb"
+                extension = "aab"
 
             prefixion = str.format("{}\\launcher\\build\\outputs\\{}\\{}", export_path, symbol, final_path)
             package_path = str.format("{}\\launcher-{}.{}", prefixion, final_path, extension)
