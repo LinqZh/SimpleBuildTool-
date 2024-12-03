@@ -28,6 +28,7 @@ if __name__ == '__main__':
     arg_parser.add_argument("-r", "--isRename", help="Is rename package after build.", default="true")
     arg_parser.add_argument("-p", "--padType", help="Resouces dispatch mode.", default="None")
     arg_parser.add_argument("-o", "--overlayInstallType", help="Overlay install type.", default="None")
+    arg_parser.add_argument("-f", "--forceClean", help="Clean history build cache and build.", default="false")
     args = arg_parser.parse_args()
 
     time_now = asctime(localtime(time()))
@@ -52,6 +53,7 @@ if __name__ == '__main__':
     param_pass_parser.set("buildParams", "isDebug", args.isDebug)
     param_pass_parser.set("buildParams", "PadType", args.padType)
     param_pass_parser.set("buildParams", "OverlayInstallType", args.overlayInstallType)
+    param_pass_parser.set("buildParams", "ForceClean", "0" if args.forceClean == "true" else "1")
     param_pass_path = str.format("{}\\Assets\\temp.ini", project_path)
     param_pass_parser.write(open(param_pass_path, 'w'))
 
@@ -113,6 +115,12 @@ if __name__ == '__main__':
     except CalledProcessError as e:
         print(e.stderr.decode())
 
+    def clear_template_files():
+        remove(param_pass_path)
+        meta_path = str.format("{}.meta", param_pass_path)
+        if path.exists(meta_path):
+            remove(meta_path)
+
     print_build_log("=============================================AS build started.=============================================\n")
     export_path = parser["global"]["output_path"]
     work_space = parser["global"]["work_space"]
@@ -142,13 +150,11 @@ if __name__ == '__main__':
             package_path = str.format("{}\\launcher-{}.{}", prefixion, final_path, extension)
             if not path.exists(package_path):
                 print_build_log("Can not find output package.")
+                clear_template_files()
                 exit(1)
 
             rename(package_path, str.format("{}\\{}.{}", prefixion, package_name, extension))
     
     as_process.kill()
 
-    remove(param_pass_path)
-    meta_path = str.format("{}.meta", param_pass_path)
-    if path.exists(meta_path):
-        remove(meta_path)
+    clear_template_files()

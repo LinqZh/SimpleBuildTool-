@@ -17,7 +17,8 @@ Python 3.*, local script execution rights for PowerShell, Windows environment, U
 - alias: signature file character set
 - key_password: signature file character set password 
 4. Use ``` bat
-python <env.work_space>\Build.py -c <code_version> -d <package_type> -r <rename_final_package> -p <resource_distribution_type> -o <overwrite_install_prompt> ```
+python <env.work_space>\Build.py -c <code_version> -d <package_type> -r <rename_final_package> -p <resource_distribution_type> -o <overwrite_install_prompt> -f <need_force_cache_clearing>
+```
 
 
 The Process:

@@ -18,7 +18,7 @@ Python3.*、powershell本地脚本运行权限、Windows环境、Unity
 - key_password ：签名文件字符集密码
 4、使用
 ``` bat
-python <env.work_space>\Build.py -c <代码版本> -d <包体类型> -r <是否重命名最终出包> -p <资源分发类型> -o <覆盖安装提示>
+python <env.work_space>\Build.py -c <代码版本> -d <包体类型> -r <是否重命名最终出包> -p <资源分发类型> -o <覆盖安装提示> -f <是否强制清理缓存>
 ```
 
 ## 执行流程

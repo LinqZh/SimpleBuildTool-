@@ -24,6 +24,7 @@ public class LocalBuildTools
         var tempSB = new StringBuilder(1024);
         _path = tempSB.Append(Application.dataPath).Append("\\temp.ini").ToString();
         bool isDebug = true;
+        bool isNeedClean = false;
         if (File.Exists(_path))
         {
             AssetsSetting.Instance.codeVersionName = GetIniSetting(tempSB, "buildParams", "codeVersion", "1.0.0");
@@ -31,11 +32,30 @@ public class LocalBuildTools
             isDebug = AssetsSetting.Instance.PackerType == PackerType.Debug;
             AssetsSetting.Instance.PadType = GetPadType(GetIniSetting(tempSB, "buildParams", "PadType", "None"));
             AssetsSetting.Instance.OverlayInstallType = GetOverlayInstallType(GetIniSetting(tempSB, "buildParams", "OverlayInstallType", "None"));
+            AssetsSetting.Instance.BuildTime = BuildHelper.GetTimeString();
+            isNeedClean = GetIniSetting(tempSB, "buildParams", "ForceClean", "0") == "1";
             Console.WriteLine(BFFramework.Utility.Text.Format("Read setting, version: {0}, isDebug: {1}", AssetsSetting.Instance.versionNum, isDebug));
             ResVersionHelper.FlushSetting();
         }
-        StartBuild(PlatformType.Android/**/, BuildAssetBundleOptions.ChunkBasedCompression, BuildOptions.None, isDebug, true, true, true, true, AssetsSetting.Instance.PadType);
-    }/**/
+
+        if (isNeedClean)
+        {
+            AndroidReleaseTool.ClearAndroidStudioCache();
+            BuildHelper.BuildPlayer();
+        }
+        else
+        {
+            StartBuild(PlatformType.Android, BuildAssetBundleOptions.ChunkBasedCompression, BuildOptions.None, isDebug, true, true, true, true,
+                AssetsSetting.Instance.PadType);
+        }
+        
+        if (File.Exists(_path))
+        {
+            string packType = (AssetsSetting.Instance.PackerType.ToString().IndexOf("Debug") > -1) ? "Test" : "release";
+            WritePrivateProfileString("buildOutput", "packageName", BFFramework.Utility.Text.Format("{0}_{1}_{2}{3}", BuildHelper.GetProgramName(), AssetsSetting.Instance.codeVersionName, packType, AssetsSetting.Instance.BuildTime), _path);
+            WritePrivateProfileString("buildOutput", "aabName", BFFramework.Utility.Text.Format("{0}_{1}", BuildHelper.GetProgramName(), AssetsSetting.Instance.codeVersionName), _path);
+        }
+    }
 
     private static string GetIniSetting(StringBuilder temp, string section, string name, string defaultValue)
     {
@@ -102,12 +122,5 @@ public class LocalBuildTools
             "ackeydffghjhjkdsfdgcvm", 
             BuildHelper.IsGooglePad(padType));
         
-        
-        if (File.Exists(_path))
-        {
-            string packType = (AssetsSetting.Instance.PackerType.ToString().IndexOf("Debug") > -1) ? "Test" : "release";
-            WritePrivateProfileString("buildOutput", "packageName", BFFramework.Utility.Text.Format("{0}_{1}_{2}{3}", BuildHelper.GetProgramName(), AssetsSetting.Instance.codeVersionName, packType, AssetsSetting.Instance.BuildTime), _path);
-            WritePrivateProfileString("buildOutput", "aabName", BFFramework.Utility.Text.Format("{0}_{1}", BuildHelper.GetProgramName(), AssetsSetting.Instance.codeVersionName), _path);
-        }
     }
 }
